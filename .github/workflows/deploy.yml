@@ -1,0 +1,56 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - '**'  # Запускается при пуше в любую ветку
+
+jobs:
+
+  debug:
+    runs-on: ubuntu-latest
+    name: Debug
+
+    steps:
+    - name: Print GitHub actor
+      run: echo "Running as $GITHUB_ACTOR"
+
+  build:
+    runs-on: ubuntu-latest
+    name: Build & Test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Build and run tests
+        run: mvn -B clean verify
+
+#  deploy:
+#    runs-on: ubuntu-latest
+#    name: Deploy to GitHub Packages
+#    needs: build
+#    if: github.ref == 'refs/heads/main'  # Только если push в main
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v4
+#
+#      - name: Set up JDK
+#        uses: actions/setup-java@v4
+#        with:
+#          distribution: 'temurin'
+#          java-version: '17'
+#          cache: 'maven'
+#
+#      - name: Publish to GitHub Packages
+#        run: mvn deploy
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
